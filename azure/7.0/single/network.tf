@@ -1,48 +1,40 @@
 // Create Virtual Network
 
-resource "azurerm_virtual_network" "fgtvnetwork" {
+resource "azurerm_virtual_network" "virtual_network" {
   name                = "fgtvnetwork"
   address_space       = [var.vnetcidr]
   location            = var.location
-  resource_group_name = azurerm_resource_group.myterraformgroup.name
-
-  tags = {
-    environment = "Terraform Demo"
-  }
+  resource_group_name = azurerm_resource_group.resource_group.name
 }
 
-resource "azurerm_subnet" "publicsubnet" {
+resource "azurerm_subnet" "subnet_public" {
   name                 = "publicSubnet"
-  resource_group_name  = azurerm_resource_group.myterraformgroup.name
-  virtual_network_name = azurerm_virtual_network.fgtvnetwork.name
+  resource_group_name  = azurerm_resource_group.resource_group.name
+  virtual_network_name = azurerm_virtual_network.virtual_network.name
   address_prefixes     = [var.publiccidr]
 }
 
-resource "azurerm_subnet" "privatesubnet" {
+resource "azurerm_subnet" "subnet_private" {
   name                 = "privateSubnet"
-  resource_group_name  = azurerm_resource_group.myterraformgroup.name
-  virtual_network_name = azurerm_virtual_network.fgtvnetwork.name
+  resource_group_name  = azurerm_resource_group.resource_group.name
+  virtual_network_name = azurerm_virtual_network.virtual_network.name
   address_prefixes     = [var.privatecidr]
 }
 
 
 // Allocated Public IP
-resource "azurerm_public_ip" "FGTPublicIp" {
+resource "azurerm_public_ip" "public_ip" {
   name                = "FGTPublicIP"
-  location            = var.location
-  resource_group_name = azurerm_resource_group.myterraformgroup.name
+  location            = azurerm_resource_group.resource_group.location
+  resource_group_name = azurerm_resource_group.resource_group.name
   allocation_method   = "Static"
-
-  tags = {
-    environment = "Terraform Demo"
-  }
 }
 
 //  Network Security Group
-resource "azurerm_network_security_group" "publicnetworknsg" {
+resource "azurerm_network_security_group" "security_group_public" {
   name                = "PublicNetworkSecurityGroup"
-  location            = var.location
-  resource_group_name = azurerm_resource_group.myterraformgroup.name
+  location            = azurerm_resource_group.resource_group.location
+  resource_group_name = azurerm_resource_group.resource_group.name
 
   security_rule {
     name                       = "TCP"
@@ -55,16 +47,12 @@ resource "azurerm_network_security_group" "publicnetworknsg" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
-
-  tags = {
-    environment = "Terraform Demo"
-  }
 }
 
-resource "azurerm_network_security_group" "privatenetworknsg" {
+resource "azurerm_network_security_group" "security_group_private" {
   name                = "PrivateNetworkSecurityGroup"
-  location            = var.location
-  resource_group_name = azurerm_resource_group.myterraformgroup.name
+  location            = azurerm_resource_group.resource_group.location
+  resource_group_name = azurerm_resource_group.resource_group.name
 
   security_rule {
     name                       = "All"
@@ -77,13 +65,9 @@ resource "azurerm_network_security_group" "privatenetworknsg" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
-
-  tags = {
-    environment = "Terraform Demo"
-  }
 }
 
-resource "azurerm_network_security_rule" "outgoing_public" {
+resource "azurerm_network_security_rule" "security_rule_public" {
   name                        = "egress"
   priority                    = 100
   direction                   = "Outbound"
@@ -93,11 +77,11 @@ resource "azurerm_network_security_rule" "outgoing_public" {
   destination_port_range      = "*"
   source_address_prefix       = "*"
   destination_address_prefix  = "*"
-  resource_group_name         = azurerm_resource_group.myterraformgroup.name
-  network_security_group_name = azurerm_network_security_group.publicnetworknsg.name
+  resource_group_name         = azurerm_resource_group.resource_group.name
+  network_security_group_name = azurerm_network_security_group.security_group_public.name
 }
 
-resource "azurerm_network_security_rule" "outgoing_private" {
+resource "azurerm_network_security_rule" "security_rule_private" {
   name                        = "egress-private"
   priority                    = 100
   direction                   = "Outbound"
@@ -107,55 +91,45 @@ resource "azurerm_network_security_rule" "outgoing_private" {
   destination_port_range      = "*"
   source_address_prefix       = "*"
   destination_address_prefix  = "*"
-  resource_group_name         = azurerm_resource_group.myterraformgroup.name
-  network_security_group_name = azurerm_network_security_group.privatenetworknsg.name
+  resource_group_name         = azurerm_resource_group.resource_group.name
+  network_security_group_name = azurerm_network_security_group.security_group_private.name
 }
 
 // FGT Network Interface port1
-resource "azurerm_network_interface" "fgtport1" {
+resource "azurerm_network_interface" "network_interface_1" {
   name                = "fgtport1"
-  location            = var.location
-  resource_group_name = azurerm_resource_group.myterraformgroup.name
+  location            = azurerm_resource_group.resource_group.location
+  resource_group_name = azurerm_resource_group.resource_group.name
 
   ip_configuration {
     name                          = "ipconfig1"
-    subnet_id                     = azurerm_subnet.publicsubnet.id
+    subnet_id                     = azurerm_subnet.subnet_public.id
     private_ip_address_allocation = "Dynamic"
     primary                       = true
-    public_ip_address_id          = azurerm_public_ip.FGTPublicIp.id
-  }
-
-  tags = {
-    environment = "Terraform Demo"
+    public_ip_address_id          = azurerm_public_ip.public_ip.id
   }
 }
 
-resource "azurerm_network_interface" "fgtport2" {
+resource "azurerm_network_interface" "network_interface_2" {
   name                 = "fgtport2"
-  location             = var.location
-  resource_group_name  = azurerm_resource_group.myterraformgroup.name
+  location             = azurerm_resource_group.resource_group.location
+  resource_group_name  = azurerm_resource_group.resource_group.name
   enable_ip_forwarding = true
 
   ip_configuration {
     name                          = "ipconfig1"
-    subnet_id                     = azurerm_subnet.privatesubnet.id
+    subnet_id                     = azurerm_subnet.subnet_private.id
     private_ip_address_allocation = "Dynamic"
-  }
-
-  tags = {
-    environment = "Terraform Demo"
   }
 }
 # Connect the security group to the network interfaces
-resource "azurerm_network_interface_security_group_association" "port1nsg" {
-  depends_on                = [azurerm_network_interface.fgtport1]
-  network_interface_id      = azurerm_network_interface.fgtport1.id
-  network_security_group_id = azurerm_network_security_group.publicnetworknsg.id
+resource "azurerm_network_interface_security_group_association" "security_group_association_port1" {
+  network_interface_id      = azurerm_network_interface.network_interface_1.id
+  network_security_group_id = azurerm_network_security_group.security_group_public.id
 }
 
-resource "azurerm_network_interface_security_group_association" "port2nsg" {
-  depends_on                = [azurerm_network_interface.fgtport2]
-  network_interface_id      = azurerm_network_interface.fgtport2.id
-  network_security_group_id = azurerm_network_security_group.privatenetworknsg.id
+resource "azurerm_network_interface_security_group_association" "security_group_association_port2" {
+  network_interface_id      = azurerm_network_interface.network_interface_2.id
+  network_security_group_id = azurerm_network_security_group.security_group_private.id
 }
 

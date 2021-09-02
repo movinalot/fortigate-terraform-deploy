@@ -1,17 +1,3 @@
-output "ResourceGroup" {
-  value = azurerm_resource_group.myterraformgroup.name
+output "curl_command" {
+  value = "curl -k -H \"Authorization: Bearer ${random_string.random_apikey.id}\" https://${azurerm_public_ip.public_ip.ip_address}/api/v2/cmdb/system/global"
 }
-
-output "FGTPublicIP" {
-  value = azurerm_public_ip.FGTPublicIp.ip_address
-
-}
-
-output "Username" {
-  value = var.adminusername
-}
-
-output "Password" {
-  value = var.adminpassword
-}
-
