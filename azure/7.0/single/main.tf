@@ -12,8 +12,4 @@ resource "azurerm_resource_group" "resource_group" {
 resource "random_string" "random_apikey" {
   length  = 30
   special = false
-
-  keepers = {
-    resource_group = azurerm_resource_group.resource_group.name
-  }
 }
