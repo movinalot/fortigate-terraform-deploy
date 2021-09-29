@@ -1,29 +1,29 @@
 // Azure configuration
 
-variable "size" {
+variable "vm_size" {
   type    = string
   default = "Standard_F4"
 }
 
 // License Type to create FortiGate-VM
 // Provide the license type for FortiGate-VM Instances, either byol or payg.
-variable "license_type" {
+variable "vm_license_type" {
   default = "payg"
 }
 
-variable "publisher" {
+variable "vm_publisher" {
   type    = string
   default = "fortinet"
 }
 
-variable "fgtoffer" {
+variable "vm_offer" {
   type    = string
   default = "fortinet_fortigate-vm_v5"
 }
 
 // BYOL sku: fortinet_fg-vm
 // PAYG sku: fortinet_fg-vm_payg_20190624
-variable "fgtsku" {
+variable "vm_sku" {
   type = map(any)
   default = {
     byol = "fortinet_fg-vm"
@@ -31,17 +31,17 @@ variable "fgtsku" {
   }
 }
 
-variable "fgtversion" {
+variable "vm_version" {
   type    = string
-  default = "7.0.1"
+  default = "6.4.2"
 }
 
-variable "adminusername" {
+variable "vm_username" {
   type    = string
   default = "azureuser"
 }
 
-variable "adminpassword" {
+variable "vm_password" {
   type    = string
   default = "Password123!!!"
 }
@@ -60,22 +60,22 @@ variable "vnetcidr" {
   default = "10.33.0.0/16"
 }
 
-variable "publiccidr" {
+variable "external_subnet" {
   default = "10.33.0.0/24"
 }
 
-variable "privatecidr" {
+variable "internal_subnet" {
   default = "10.33.1.0/24"
 }
 
-variable "bootstrap-fgtvm" {
+variable "vm_config" {
   // Change to your own path
   type    = string
   default = "fgtvm.conf"
 }
 
 // license file for the fgt
-variable "license" {
+variable "vm_license_file" {
   // Change to your own byol license file, license.lic
   type    = string
   default = "license.txt"
@@ -86,4 +86,3 @@ variable "api_key" {
   type    = string
   default = "none"
 }
-

@@ -8,23 +8,23 @@ resource "azurerm_virtual_network" "virtual_network" {
 }
 
 resource "azurerm_subnet" "subnet_public" {
-  name                 = "publicSubnet"
+  name                 = "external"
   resource_group_name  = azurerm_resource_group.resource_group.name
   virtual_network_name = azurerm_virtual_network.virtual_network.name
-  address_prefixes     = [var.publiccidr]
+  address_prefixes     = [var.external_subnet]
 }
 
 resource "azurerm_subnet" "subnet_private" {
-  name                 = "privateSubnet"
+  name                 = "internal"
   resource_group_name  = azurerm_resource_group.resource_group.name
   virtual_network_name = azurerm_virtual_network.virtual_network.name
-  address_prefixes     = [var.privatecidr]
+  address_prefixes     = [var.internal_subnet]
 }
 
 
 // Allocated Public IP
 resource "azurerm_public_ip" "public_ip" {
-  name                = "FGTPublicIP"
+  name                = "fgt-public-ip"
   location            = azurerm_resource_group.resource_group.location
   resource_group_name = azurerm_resource_group.resource_group.name
   allocation_method   = "Static"
@@ -32,7 +32,7 @@ resource "azurerm_public_ip" "public_ip" {
 
 //  Network Security Group
 resource "azurerm_network_security_group" "security_group_public" {
-  name                = "PublicNetworkSecurityGroup"
+  name                = "externalNetworkSecurityGroup"
   location            = azurerm_resource_group.resource_group.location
   resource_group_name = azurerm_resource_group.resource_group.name
 
@@ -50,7 +50,7 @@ resource "azurerm_network_security_group" "security_group_public" {
 }
 
 resource "azurerm_network_security_group" "security_group_private" {
-  name                = "PrivateNetworkSecurityGroup"
+  name                = "internalNetworkSecurityGroup"
   location            = azurerm_resource_group.resource_group.location
   resource_group_name = azurerm_resource_group.resource_group.name
 

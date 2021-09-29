@@ -9,7 +9,7 @@ resource "azurerm_resource_group" "resource_group" {
   }
 }
 
-resource "random_string" "random_apikey" {
-  length  = 30
+resource "random_string" "apikey" {
+  length  = (var.vm_version == "6.4.2" ? 16 : 30)
   special = false
 }

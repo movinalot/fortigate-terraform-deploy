@@ -2,9 +2,10 @@ resource "azurerm_route_table" "route_table" {
   name                = "internalroutetable"
   location            = azurerm_resource_group.resource_group.location
   resource_group_name = azurerm_resource_group.resource_group.name
+
 }
 
-resource "azurerm_route" "default" {
+resource "azurerm_route" "route" {
   name                   = "default"
   resource_group_name    = azurerm_resource_group.resource_group.name
   route_table_name       = azurerm_route_table.route_table.name
